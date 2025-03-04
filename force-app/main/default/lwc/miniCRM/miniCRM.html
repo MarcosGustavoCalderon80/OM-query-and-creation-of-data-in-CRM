@@ -1,0 +1,177 @@
+<template>
+  <!-- Botones de acción -->
+  <div class="slds-text-align_center">
+    <lightning-button label="Add Contact" variant="neutral" onclick={handleAddContactClick}></lightning-button>
+    <lightning-button label="List Contacts" variant="neutral" onclick={handleListContactsClick}></lightning-button>
+    <lightning-button label="Add Account" variant="neutral" onclick={handleAddAccountClick}></lightning-button>
+    <lightning-button label="List Accounts" variant="neutral" onclick={handleListAccountsClick}></lightning-button>
+    <lightning-button label="Add Order" variant="neutral" onclick={handleAddOrderClick}></lightning-button>
+    <lightning-button label="List Orders" variant="neutral" onclick={handleListOrdersClick}></lightning-button>
+  </div>
+
+  <!-- Formulario o Lista según el tipo seleccionado -->
+  <template if:true={isAddFormVisible}>
+    <!-- Mostrar formulario dependiendo del tipo -->
+    <template if:true={isAddingContact}>
+      <!-- Formulario para Contact -->
+      <lightning-card title="New Contact" class="newContact">
+        <div class="slds-var-m-around_medium">
+          <lightning-input 
+            label="* FirstName" 
+            value={firstName} 
+            onchange={handleInputChange} 
+            name="firstName">
+          </lightning-input>
+          <lightning-input 
+            label="* LastName" 
+            value={lastName} 
+            onchange={handleInputChange} 
+            name="lastName">
+          </lightning-input>
+          <lightning-input 
+            label="* Email" 
+            value={email}   
+            onchange={handleInputChange} 
+            name="email">
+          </lightning-input>
+          <lightning-input 
+            label="Phone" 
+            value={phone} 
+            onchange={handleInputChange} 
+            name="phone">
+          </lightning-input>
+          <lightning-input 
+            label="Account ID" 
+            value={accountId} 
+            onchange={handleInputChange} 
+            name="accountId">
+          </lightning-input>
+        </div>
+        <div id="buttonWrapper" class="slds-text-align_center">  
+          <lightning-button label="Create" variant="brand" onclick={handleSubmit}></lightning-button>
+          <lightning-button label="Reset" onclick={clearInputFields}></lightning-button>
+        </div>
+      </lightning-card>
+    </template>
+
+    <template if:true={isAddingAccount}>
+      <!-- Formulario para Account -->
+      <lightning-card title="New Account" class="newAccount">
+        <div class="slds-var-m-around_medium">
+          <lightning-input 
+            label="* Account Name"
+            value={newAccountName} 
+            onchange={handleInputChange} 
+            name="newAccountName">
+          </lightning-input>
+          <lightning-input 
+            label="Phone"
+            value={phone} 
+            onchange={handleInputChange} 
+            name="phone">
+          </lightning-input>
+        </div>
+        <div id="buttonWrapper2" class="slds-text-align_center">  
+          <lightning-button label="Create" variant="brand" onclick={handleSubmit}></lightning-button>
+          <lightning-button label="Reset" onclick={clearInputFields}></lightning-button>
+        </div>
+      </lightning-card>
+    </template>
+
+    <template if:true={isAddingOrder}>
+      <lightning-card title="Create Order" class="createOrder">
+          <div class="slds-p-around_small">
+              <lightning-input 
+                  label="Order Name" 
+                  value={orderName} 
+                  onchange={handleInputChange} 
+                  name="orderName"
+                  required>
+              </lightning-input>
+              <lightning-input 
+                  label="Gestion" 
+                  value={gestion} 
+                  onchange={handleInputChange} 
+                  name="gestion">
+              </lightning-input>
+              <lightning-input 
+                  label="Effective Date" 
+                  value={effectiveDate} 
+                  onchange={handleInputChange} 
+                  name="effectiveDate"
+                  type="date"
+                  required>
+              </lightning-input>
+              <lightning-input 
+                  label="Account ID" 
+                  value={accountId} 
+                  onchange={handleInputChange} 
+                  name="accountId"
+                  required>
+              </lightning-input>
+              <lightning-input 
+                  label="Description" 
+                  value={description}
+                  onchange={handleInputChange}
+                  name="description"
+                  type="text">
+              </lightning-input>
+          </div>
+          <div id="buttonWrapper3" class="slds-text-align_center">
+              <lightning-button label="Create Order" variant="brand" onclick={handleSubmit}></lightning-button>
+              <lightning-button label="Reset" onclick={clearInputFields}></lightning-button>
+          </div>
+      </lightning-card>
+  </template>
+  </template>
+
+  <!-- Lista de elementos -->
+  <template if:false={isAddFormVisible}>
+    <template if:true={isAddingContact}>
+      <!-- Mostrar lista de Contactos -->
+      <lightning-card title="Contacts">
+        <ul>
+          <template for:each={contacts} for:item="contact">
+            <li key={contact.Id}>
+                <p class="orderName"><strong>* Contact Name:</strong> {contact.LastName} - {contact.FirstName} <strong>--</strong>
+                  <lightning-button class="buttonAccountLink" variant="link" label={contact.Id} onclick={handleAccountClick} data-id={contact.Id}></lightning-button>
+                </p>
+            </li>
+        </template>
+        </ul>
+      </lightning-card>
+    </template>
+
+    <template if:true={isAddingAccount}>
+      <!-- Mostrar lista de Cuentas -->
+      <lightning-card title="Accounts">
+        <ul>
+          <template for:each={accounts} for:item="account">
+            <li key={account.Id}>
+                <p class="orderName"><strong>* Account Name:</strong> {account.Name} <strong>--</strong> 
+                  <lightning-button class="buttonAccountLink" variant="link" label={account.Id} onclick={handleAccountClick} data-id={account.Id}></lightning-button>
+                </p>
+            </li>
+        </template>
+        </ul>
+      </lightning-card>
+    </template>
+
+    <template if:true={isAddingOrder}>
+      <!-- Mostrar lista de Órdenes -->
+      <lightning-card title="Orders">
+        <ul>
+          <template for:each={orders} for:item="order">
+            <li key={order.Id}>
+                <template if:true={order.Name}>
+                  <p class="orderName"><strong>* Orden Name:</strong> {order.Name} - {order.EffectiveDate} <strong>--</strong>
+                    <lightning-button class="buttonOrderLink" variant="link" label={order.Id} onclick={handleOrderClick} data-id={order.Id}></lightning-button>
+                  </p>
+                </template>
+            </li>
+          </template>
+        </ul>
+      </lightning-card>
+    </template>
+  </template>
+</template>

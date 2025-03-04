@@ -1,0 +1,57 @@
+<template>
+    <lightning-card title="New Contact" class="newContact">
+      <div class="slds-var-m-around_medium">
+        <lightning-input 
+          label="* FirstName" 
+          value={firstName} 
+          placeholder="Enter First Name..."
+          onchange={handleInputChange}
+          name="firstName">
+        </lightning-input>
+
+        <lightning-input 
+          label="* LastName" 
+          value={lastName} 
+          placeholder="Enter Last Name..."
+          onchange={handleInputChange}
+          name="lastName">
+        </lightning-input>
+
+        <lightning-input 
+          label="* Email" 
+          value={email}   
+          placeholder="Enter Email..."
+          onchange={handleInputChange}
+          name="email">
+        </lightning-input>
+
+        <lightning-input 
+          label="Phone" 
+          value={phone} 
+          placeholder="Enter Phone..."
+          onchange={handleInputChange}
+          name="phone">
+        </lightning-input>
+        
+        <lightning-input 
+          label="Account ID" 
+          value={accountId} 
+          placeholder="Enter the ID of an existing Account..."
+          onchange={handleInputChange} 
+          name="accountId">
+        </lightning-input>
+            
+        <lightning-input 
+            label="Create new account" 
+            value={newAccountName} 
+            placeholder="Create new account by entering a name..." 
+            onchange={handleInputChange} 
+            name="newAccountName">
+        </lightning-input>
+      </div>
+      <div id="buttonWrapper" class="slds-var-p-top_x-small slda-p-botton_medium slds-text-align_center">  
+          <lightning-button label="Create" variant="brand"  class="slds-var-m-left_x-small" onclick={handleSubmit}></lightning-button>
+          <lightning-button label="Reset" class="slds-var-m-left_x-small" onclick={clearInputField}></lightning-button>
+      </div>
+    </lightning-card>
+  </template>

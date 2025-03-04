@@ -1,0 +1,47 @@
+.search {
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    color: royalblue;
+    font-weight: bold !important;
+    background-color: white !important;
+    border-radius: 5px;
+    height: 180px;
+    width: 100%;
+
+}
+.searchTitle {
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    font-size: 20px !important;
+    padding: 10px 10px 0px 10px;
+
+}
+.inputSearch {
+    width: 100%;
+    padding: 0px 30px;
+}
+.buttonReset {
+    color: white;
+    border: none;
+    padding: 10px 0px 10px 30px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 10px 0px;
+    cursor: pointer;
+}
+.buttonOrderLink {
+    padding: 10px 0px 5px 30px !important;
+    font-size: 16px !important;
+    margin: 10px 0px !important;
+    cursor: pointer !important;
+}
+.buttonAccountLink {
+    padding: 10px 0px 5px 30px !important;
+    font-size: 16px !important;
+    margin: 10px 0px !important;
+    cursor: pointer !important;
+}
+.orderName {
+    padding: 10px 0px 5px 30px !important;
+
+}

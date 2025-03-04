@@ -1,0 +1,36 @@
+<template>
+    <div class="search">
+        <h4 slot="title" class='searchTitle'>Search account or order</h4>
+        <lightning-input class="inputSearch" value={searchTerm} onchange={handleSearchChange} placeholder="Enter Account Name, Order Name or ID..."></lightning-input>
+
+        <lightning-button label="Reset" class="buttonReset" onclick={clearInputField}></lightning-button>
+    </div>
+
+        <template if:true={accounts.length}>
+            <lightning-card title="Resultados de Cuentas">
+                <ul>
+                    <template for:each={accounts} for:item="account">
+                        <li key={account.Id}>
+                            <p class="orderName"><strong>Nombre de la Cuenta:</strong> {account.Name} - ({account.Id})</p>
+                            <lightning-button class="buttonAccountLink" variant="link" label={account.Id} onclick={handleAccountClick} data-id={account.Id}></lightning-button>
+                        </li>
+                    </template>
+                </ul>
+            </lightning-card>
+        </template>
+
+        <template if:true={orders.length}>
+            <lightning-card title="Resultados de Órdenes">
+                <ul>
+                    <template for:each={orders} for:item="order">
+                        <li key={order.Id}>
+                            <template if:true={order.Name}>
+                                <p class="orderName"><strong>Nombre de la Orden:</strong> {order.Name} - ({order.Id})</p>
+                            </template>
+                            <lightning-button class="buttonOrderLink" variant="link" label={order.OrderNumber} onclick={handleOrderClick} data-id={order.Id}></lightning-button>
+                        </li>
+                    </template>
+                </ul>
+            </lightning-card>
+        </template>
+</template>

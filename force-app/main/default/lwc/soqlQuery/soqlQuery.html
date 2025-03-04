@@ -1,0 +1,34 @@
+<template>
+    <lightning-card icon-name="standard:account" variant="base">
+
+        <lightning-input label="Consulta SOQL" value={soqlQuery} onchange={handleQueryChange} onkeydown={handleKeyDown}
+            placeholder="Escribe tu consulta SOQL" type="text">
+        </lightning-input>
+
+        <template if:true={showFieldSuggestions}>
+            <div class="autocomplete-suggestions">
+                <template for:each={fieldOptions} for:item="field">
+                    <div key={field} data-field={field} class="suggestion-item" onclick={handleFieldSelection}>
+                        {field}
+                    </div>
+                </template>
+            </div>
+        </template>
+
+        <lightning-button label="Ejecutar Consulta" onclick={handleExecuteQuery}>
+        </lightning-button>
+
+        <div>Records: {recordsLength}</div>
+    </lightning-card>
+
+    <template if:true={hasRecords}>
+        <lightning-datatable data={records} columns={columns} key-field="Id">
+        </lightning-datatable>
+    </template>
+    <template if:false={hasRecords}>
+        <p>No hay resultados para mostrar.</p>
+    </template>
+    <template if:true={error}>
+        <div class="slds-text-color_error">{error}</div>
+    </template>
+</template>

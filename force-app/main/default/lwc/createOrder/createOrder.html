@@ -1,0 +1,73 @@
+<template>
+    <lightning-card title="Create Order" class="createOrder">
+        <div class="slds-p-around_small">
+            <lightning-input 
+                label="* Order Name" 
+                value={orderName} 
+                placeholder="Enter Order Name..."
+                onchange={handleInputChange} 
+                name="orderName">
+            </lightning-input>
+
+            <lightning-input 
+                label="* Start Date" 
+                value={effectiveDate}
+                onchange={handleInputChange}
+                name="effectiveDate"
+                type="date">
+            </lightning-input>
+
+            <lightning-combobox
+                label="* Gestión"
+                value={gestion}
+                options={gestionOptions}
+                onchange={handleInputChange}
+                name="gestion">
+            </lightning-combobox>
+            
+            <lightning-combobox
+                label="SubGestión"
+                value={subGestion}
+                options={subGestionOptions}
+                onchange={handleInputChange}
+                name="subGestion">
+            </lightning-combobox>
+
+            <lightning-combobox
+                label="Delivery Method"
+                value={deliveryMethod}
+                options={deliveryMethodOptions}
+                onchange={handleInputChange}
+                name="deliveryMethod">
+            </lightning-combobox>
+
+            <lightning-input 
+                label="Account ID" 
+                value={accountId} 
+                placeholder="Enter the ID of an existing Account..."
+                onchange={handleInputChange} 
+                name="accountId">
+            </lightning-input>
+            
+            <lightning-input 
+                label="Create new account" 
+                value={newAccountName} 
+                placeholder="Create new account by entering a name..." 
+                onchange={handleInputChange} 
+                name="newAccountName">
+            </lightning-input>
+
+            <lightning-button 
+                label="Crear Orden" 
+                variant="brand" 
+                onclick={handleSubmit}>
+            </lightning-button>
+            <lightning-button 
+                label="Reset"
+                class="slds-var-m-left_x-small"
+                onclick={clearInputField}
+                >
+            </lightning-button>
+        </div>
+    </lightning-card>
+</template>

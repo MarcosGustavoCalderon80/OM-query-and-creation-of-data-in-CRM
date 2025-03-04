@@ -1,0 +1,48 @@
+<template>
+    <lightning-card class='NewAccount'>
+        <h4 slot="title">Create Account</h4>
+        <div id="content" class="slds-var-m-horizontal_large slds-var-m-vertical_small">
+            <div>
+              <div id="inputWrapper" class="accountName">
+                <lightning-input 
+                label= "* Account Name"
+                value={accountName}
+                placeholder="Enter Account Name..."
+                onchange={handlerAccountName}
+                ></lightning-input>
+              </div>
+              <div id="inputPhone" class="phone">
+                <lightning-input 
+                label= "Phone"
+                value={phone}
+                placeholder="Enter Phone Number..."
+                onchange={handlerPhone}
+                ></lightning-input>
+              </div>
+              <div id="inputWebsite" class="Website">
+                <lightning-input 
+                label= "Website"
+                value={Website}
+                placeholder="Enter Website..."
+                onchange={handlerWebsite}
+                ></lightning-input>
+              </div>
+            </div>
+            <div id="buttonWrapper" class="slds-var-p-top_x-small slda-p-botton_medium slds-text-align_center">
+                <lightning-button
+                    variant="brand" 
+                    label="Create"
+                    class="slds-var-m-left_x-small"
+                    onclick={saveAccountNameAndPhone}
+                    >
+                </lightning-button>
+                <lightning-button 
+                    label="Reset"
+                    class="slds-var-m-left_x-small"
+                    onclick={clearInputField}
+                    >
+                </lightning-button>
+            </div>
+        </div>
+    </lightning-card>
+</template>
