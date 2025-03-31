@@ -141,13 +141,12 @@
         </ul>
       </lightning-card>
     </template>
-
     <template if:true={isAddingAccount}>
       <!-- Mostrar lista de Cuentas -->
       <lightning-card title="Accounts">
         <ul>
           <template for:each={accounts} for:item="account">
-            <li key={account.Id}>
+            <li key={account.Id} class="list-item">
                 <p class="orderName"><strong>* Account Name:</strong> {account.Name} <strong>--</strong> 
                   <lightning-button class="buttonAccountLink" variant="link" label={account.Id} onclick={handleAccountClick} data-id={account.Id}></lightning-button>
                 </p>
@@ -156,7 +155,6 @@
         </ul>
       </lightning-card>
     </template>
-
     <template if:true={isAddingOrder}>
       <!-- Mostrar lista de Órdenes -->
       <lightning-card title="Orders">

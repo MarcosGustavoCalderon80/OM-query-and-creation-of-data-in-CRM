@@ -1,21 +1,61 @@
-.autocomplete-suggestions {
-    position: absolute;
-    background: white;
+.Consulta-SOQL {
+    display: flex;
+    flex-direction: column;
+    color: blue;
+    font-size: 20px;
+    font-family: monospace;
+    margin: 5px;
+    padding: 10px;
+}
+.soql-textarea {
+    height: 130px;
+    font-size: 16px;
+    font-family: monospace;
+    padding: 6px;
     border: 1px solid #ccc;
-    max-height: 200px;
+    border-radius: 4px;
+    margin: 10px;
+}
+.suggestions-line {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    background-color: #f3f3f3;
+    border-radius: 4px;
+    margin-bottom: 0.5rem;
+    max-height: 150px;
     overflow-y: auto;
-    z-index: 1000;
+    border: 1px solid #dddbda;
 }
 
 .suggestion-item {
-    padding: 5px;
+    background-color: #ffffff;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    border: 1px solid #dddbda;
     cursor: pointer;
+    font-family: monospace;
+    font-size: 0.875rem;
+    white-space: nowrap;
+    transition: all 0.2s;
 }
 
 .suggestion-item:hover {
-    background-color: #f0f0f0;
+    background-color: #eef4ff;
+    border-color: #1589ee;
+    color: #0176d3;
 }
 
-.slds-text-color_error {
-    color: #c23934;
+.button-ejecutar {
+    margin-top: 10px;
+    padding: 10px 20px;
+    color: rgb(15, 63, 139);
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+.button-ejecutar:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
 }

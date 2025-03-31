@@ -1,29 +1,30 @@
 <template>
     <lightning-card icon-name="standard:account" variant="base">
-
-        <lightning-input label="Consulta SOQL" value={soqlQuery} onchange={handleQueryChange} onkeydown={handleKeyDown}
-            placeholder="Escribe tu consulta SOQL" type="text">
-        </lightning-input>
-
-        <template if:true={showFieldSuggestions}>
-            <div class="autocomplete-suggestions">
-                <template for:each={fieldOptions} for:item="field">
-                    <div key={field} data-field={field} class="suggestion-item" onclick={handleFieldSelection}>
-                        {field}
-                    </div>
+        <div>
+            <p class="Consulta-SOQL">Consulta SOQL</p>
+        </div>
+        <template if:true={fieldSuggestions.length}>
+            <div class="suggestions-line">
+                <template for:each={fieldSuggestions} for:item="field">
+                    <span key={field} data-field={field} class="suggestion-item" onclick={handleFieldClick}>{field}</span>
                 </template>
             </div>
         </template>
-
-        <lightning-button label="Ejecutar Consulta" onclick={handleExecuteQuery}>
-        </lightning-button>
-
-        <div>Records: {recordsLength}</div>
+        <lightning-textarea class="soql-textarea"
+            value={soqlQuery} 
+            onchange={handleQueryChange} 
+            onkeydown={handleKeyDown}
+            onclick={handleQueryChange}
+            placeholder="Escribe tu consulta SOQL" 
+            type="text">
+        </lightning-textarea>
+        <div class="button-ejecutar">
+            <lightning-button label="Ejecutar Consulta" onclick={handleExecuteQuery}></lightning-button>
+            <div>Records: {recordsLength}</div>
+        </div>
     </lightning-card>
-
     <template if:true={hasRecords}>
-        <lightning-datatable data={records} columns={columns} key-field="Id">
-        </lightning-datatable>
+        <lightning-datatable data={records} columns={columns} key-field="Id"></lightning-datatable>
     </template>
     <template if:false={hasRecords}>
         <p>No hay resultados para mostrar.</p>

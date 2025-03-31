@@ -7,80 +7,168 @@ export default class SoqlQueryExecutor extends LightningElement {
     @track records = [];
     @track columns = [];
     @track error;
-    @track fieldOptions = [];
-    @track showFieldSuggestions = false;
+    @track fieldSuggestions = [];
+    @track allFields = {};
+    @track cursorPosition = 0;
     objectName = '';
+    isSelectingField = false;
 
-    // Maneja el cambio en el campo de consulta SOQL
     handleQueryChange(event) {
         this.soqlQuery = event.target.value;
-        this.extractObjectNameFromQuery();
-        if (this.objectName) {
-            this.fetchFields(this.objectName);
-        } else {
-            this.showFieldSuggestions = false;
+        this.cursorPosition = event.target.selectionStart;
+        
+        if (!this.isSelectingField) {
+            this.extractObjectNameFromQuery();
+            if (this.objectName) {
+                this.fetchFields(this.objectName);
+            } else {
+                this.fieldSuggestions = [];
+            }
         }
+        this.isSelectingField = false;
     }
 
-    // Detecta teclas especiales (Enter y Esc)
     handleKeyDown(event) {
-        if (event.key === 'Enter') {
-            // Ejecuta la consulta al presionar Enter
+        if (event.key === 'Enter' && !event.shiftKey) {
+            event.preventDefault();
             this.handleExecuteQuery();
         } else if (event.key === 'Escape') {
-            // Oculta las sugerencias al presionar Esc
-            this.showFieldSuggestions = false;
+            this.fieldSuggestions = [];
+        } else if (event.key === 'Tab' && this.fieldSuggestions.length > 0) {
+            event.preventDefault();
+            this.handleTabKey();
         }
     }
 
-    // Extrae el nombre del objeto de la consulta SOQL
+    handleTabKey() {
+        const firstSuggestion = this.fieldSuggestions[0];
+        if (firstSuggestion) {
+            this.insertFieldAtCursor(firstSuggestion);
+        }
+    }
+
     extractObjectNameFromQuery() {
-        const queryWords = this.soqlQuery.split(' ');
-        const fromIndex = queryWords.findIndex(word => word.toLowerCase() === 'from');
-        if (fromIndex > -1 && queryWords[fromIndex + 1]) {
-            this.objectName = queryWords[fromIndex + 1].trim();
+        const queryLower = this.soqlQuery.toLowerCase();
+        const fromIndex = queryLower.lastIndexOf('from ');
+        
+        if (fromIndex > -1) {
+            const afterFrom = this.soqlQuery.slice(fromIndex + 5).trim();
+            let endIndex = afterFrom.length;
+            
+            // Buscar los siguientes posibles delimitadores
+            const delimiters = [' where ', ' limit ', ' group by ', ' order by ', '\n'];
+            for (const delimiter of delimiters) {
+                const delimiterIndex = afterFrom.toLowerCase().indexOf(delimiter);
+                if (delimiterIndex > -1 && delimiterIndex < endIndex) {
+                    endIndex = delimiterIndex;
+                }
+            }
+            
+            this.objectName = afterFrom.substring(0, endIndex)
+                .replace(/[,\s;]/g, '')
+                .replace(/\s+/g, ' ');
         } else {
             this.objectName = '';
         }
     }
 
-    // Obtiene los campos del objeto para autocompletado
     fetchFields(objectName) {
         if (!objectName) return;
+        
         getObjectFields({ objectName })
             .then(result => {
-                const lastWord = this.soqlQuery.split(' ').pop();
-                this.fieldOptions = result.filter(field => field.toLowerCase().includes(lastWord.toLowerCase()));
-                this.showFieldSuggestions = this.fieldOptions.length > 0;
+                this.allFields = result;
+                let allFieldNames = [];
+                
+                // Obtener todos los campos del objeto principal y relacionados
+                for (let obj in result) {
+                    allFieldNames = allFieldNames.concat(result[obj]);
+                }
+                
+                // Obtener el texto actual alrededor del cursor para sugerencias
+                const queryBeforeCursor = this.soqlQuery.substring(0, this.cursorPosition);
+                const lastWordBeforeCursor = queryBeforeCursor.split(/[\s,]+/).pop().toLowerCase();
+                
+                // Filtrar campos que coincidan con lo que se está escribiendo
+                this.fieldSuggestions = allFieldNames
+                    .filter(field => field.toLowerCase().includes(lastWordBeforeCursor))
+                    .sort((a, b) => {
+                        // Ordenar por coincidencia exacta al principio
+                        if (a.toLowerCase().startsWith(lastWordBeforeCursor)) return -1;
+                        if (b.toLowerCase().startsWith(lastWordBeforeCursor)) return 1;
+                        return a.localeCompare(b);
+                    });
             })
             .catch(error => {
-                let errorMessage = 'Error desconocido al obtener los campos';
-                if (error.body && error.body.message) errorMessage = error.body.message;
-                else if (error.message) errorMessage = error.message;
-                this.error = errorMessage;
-                this.showFieldSuggestions = false;
+                this.error = error.body?.message || error.message || 'Error al obtener campos';
+                this.fieldSuggestions = [];
+                console.error('Error en fetchFields:', error);
             });
     }
 
-    // Maneja la selección de un campo del autocompletado
-    handleFieldSelection(event) {
+    handleFieldClick(event) {
+        this.isSelectingField = true;
         const selectedField = event.target.dataset.field;
-        const currentQuery = this.soqlQuery.split(' ');
-        currentQuery.pop();
-        currentQuery.push(selectedField);
-        this.soqlQuery = currentQuery.join(' ');
-        this.showFieldSuggestions = false;
+        if (selectedField) {
+            const textarea = this.template.querySelector('lightning-textarea');
+            const currentValue = textarea.value;
+            const cursorPos = textarea.selectionStart;
+            
+            // Obtener el texto antes y después del cursor
+            const textBeforeCursor = currentValue.substring(0, cursorPos);
+            const textAfterCursor = currentValue.substring(cursorPos);
+            
+            // Encontrar la última palabra parcial antes del cursor
+            const lastPartialWordMatch = textBeforeCursor.match(/([\w.]+)$/);
+            const lastPartialWord = lastPartialWordMatch ? lastPartialWordMatch[0] : '';
+            
+            // Determinar contexto (SELECT, FROM, WHERE, etc.)
+            const queryBeforeCursorLower = textBeforeCursor.toLowerCase();
+            const isInSelect = queryBeforeCursorLower.includes('select') && 
+                             !queryBeforeCursorLower.includes('from');
+            
+            // Construir el nuevo texto
+            let newText;
+            if (isInSelect) {
+                // En cláusula SELECT: reemplazar solo la palabra parcial
+                const beforePartial = textBeforeCursor.substring(0, textBeforeCursor.length - lastPartialWord.length);
+                
+                // Manejar comas correctamente
+                let separator = '';
+                if (beforePartial.trim().endsWith(',')) {
+                    separator = ' ';
+                } else if (beforePartial.trim().length > 0 && !beforePartial.trim().endsWith(' ')) {
+                    separator = ', ';
+                }
+                
+                newText = beforePartial + separator + selectedField + textAfterCursor;
+            } else {
+                // En otras cláusulas: insertar el campo completo
+                newText = textBeforeCursor + selectedField + textAfterCursor;
+            }
+            
+            // Actualizar el valor
+            this.soqlQuery = newText;
+            
+            // Calcular nueva posición del cursor
+            const newCursorPos = textBeforeCursor.length - lastPartialWord.length + selectedField.length + 
+                              (isInSelect && !textBeforeCursor.trim().endsWith(',') && 
+                               textBeforeCursor.trim().length > 0 ? 2 : 0);
+            
+            // Enfocar y posicionar el cursor
+            setTimeout(() => {
+                textarea.focus();
+                textarea.setSelectionRange(newCursorPos, newCursorPos);
+                this.fieldSuggestions = [];
+            }, 0);
+        }
     }
 
-    // Ejecuta la consulta SOQL
     handleExecuteQuery() {
         if (this.soqlQuery.trim()) {
-            console.log('Ejecutando consulta SOQL:', this.soqlQuery);
             executeSoqlQuery({ query: this.soqlQuery })
                 .then(result => {
-                    console.log('Resultados recibidos:', result);
                     this.records = result.map(record => {
-                        console.log('Procesando registro:', record);
                         const flattenedRecord = {};
                         Object.keys(record).forEach(key => {
                             if (key !== 'attributes') {
@@ -93,35 +181,49 @@ export default class SoqlQueryExecutor extends LightningElement {
                                 }
                             }
                         });
-                        const objectType = record.attributes && record.attributes.type ? record.attributes.type : 'Unknown';
+                        const objectType = record.attributes?.type || 'Unknown';
                         flattenedRecord.recordUrl = `/lightning/r/${objectType}/${record.Id}/view`;
                         return flattenedRecord;
                     });
+    
                     if (result.length > 0) {
                         this.columns = Object.keys(this.records[0])
-                            .filter(key => key !== 'attributes')
+                            .filter(key => key !== 'attributes' && key !== 'recordUrl')
                             .map(key => ({
-                                label: key.replace('_', ' ').split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' '),
+                                label: key.replace(/_/g, ' ').split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' '),
                                 fieldName: key,
-                                type: key === 'recordUrl' ? 'url' : 'text'
+                                type: key === 'recordUrl' ? 'url' : 'text',
+                                typeAttributes: key === 'recordUrl' ? { 
+                                    label: { 
+                                        fieldName: this.records[0].Name ? 'Name' : 'Id' 
+                                    }, 
+                                    target: '_blank' 
+                                } : null
                             }));
-                        this.columns = [...this.columns];
-                        this.records = [...this.records];
+                        
+                        // Añadir columna de URL si existe
+                        if (this.records[0].recordUrl) {
+                            this.columns.push({
+                                label: 'Ver Registro',
+                                fieldName: 'recordUrl',
+                                type: 'url',
+                                typeAttributes: {
+                                    label: { 
+                                        fieldName: this.records[0].Name ? 'Name' : 'Id' 
+                                    },
+                                    target: '_blank'
+                                }
+                            });
+                        }
                     } else {
                         this.columns = [];
                     }
-                    console.log('Records asignados:', this.records);
-                    console.log('Columns asignados:', this.columns);
                     this.error = undefined;
                 })
                 .catch(error => {
-                    console.error('Error completo en handleExecuteQuery:', error);
-                    let errorMessage = 'Error desconocido al ejecutar la consulta';
-                    if (error.body && error.body.message) errorMessage = error.body.message;
-                    else if (error.message) errorMessage = error.message;
+                    this.error = error.body?.message || error.message || 'Error al ejecutar consulta';
                     this.records = [];
                     this.columns = [];
-                    this.error = errorMessage;
                 });
         } else {
             this.error = 'Por favor, ingresa una consulta SOQL válida.';
@@ -130,13 +232,8 @@ export default class SoqlQueryExecutor extends LightningElement {
         }
     }
 
-    // Getters para la longitud y condiciones del template
     get recordsLength() {
-        return this.records ? this.records.length : 0;
-    }
-
-    get columnsLength() {
-        return this.columns ? this.columns.length : 0;
+        return this.records?.length || 0;
     }
 
     get hasRecords() {

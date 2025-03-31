@@ -27,7 +27,7 @@
                             <template if:true={order.Name}>
                                 <p class="orderName"><strong>Nombre de la Orden:</strong> {order.Name} - ({order.Id})</p>
                             </template>
-                            <lightning-button class="buttonOrderLink" variant="link" label={order.OrderNumber} onclick={handleOrderClick} data-id={order.Id}></lightning-button>
+                            <lightning-button class="buttonOrderLink" variant="link" label={order.OrderNumber} data-id={order.Id}></lightning-button>
                         </li>
                     </template>
                 </ul>
