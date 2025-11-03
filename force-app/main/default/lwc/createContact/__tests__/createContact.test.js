@@ -1,4 +1,4 @@
-import { createElement } from 'lwc';
+import { createElement } from '@lwc/engine-dom';
 import CreateContact from 'c/createContact';
 
 describe('c-create-contact', () => {

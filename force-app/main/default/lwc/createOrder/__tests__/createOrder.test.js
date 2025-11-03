@@ -1,4 +1,4 @@
-import { createElement } from 'lwc';
+import { createElement } from '@lwc/engine-dom';
 import CreateOrder from 'c/createOrder';
 
 describe('c-create-order', () => {

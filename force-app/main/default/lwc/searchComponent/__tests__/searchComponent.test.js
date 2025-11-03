@@ -1,4 +1,4 @@
-import { createElement } from 'lwc';
+import { createElement } from '@lwc/engine-dom';
 import SearchComponent from 'c/searchComponent';
 
 describe('c-search-component', () => {

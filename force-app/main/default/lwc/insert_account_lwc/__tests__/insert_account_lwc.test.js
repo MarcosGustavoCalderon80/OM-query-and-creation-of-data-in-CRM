@@ -1,4 +1,4 @@
-import { createElement } from 'lwc';
+import { createElement } from '@lwc/engine-dom';
 import Insert_account_lwc from 'c/insert_account_lwc';
 
 describe('c-insert-account-lwc', () => {
