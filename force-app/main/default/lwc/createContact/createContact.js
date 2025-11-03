@@ -41,8 +41,8 @@ export default class CreateContact extends LightningElement {
             newAccountName: this.newAccountName 
         })
         .then(result => {
-            console.log('Order created successfully:', result);
-            this.showToast('Éxito', 'La orden se creó correctamente', 'success');
+            console.log('Contact created successfully:', result);
+            this.showToast('Éxito', 'El Contacto se creó correctamente', 'success');
             this.clearInputField();
         })
         .catch(error => {

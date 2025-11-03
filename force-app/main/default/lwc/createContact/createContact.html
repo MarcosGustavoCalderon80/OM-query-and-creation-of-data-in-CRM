@@ -1,7 +1,8 @@
 <template>
     <lightning-card title="New Contact" class="newContact">
       <div class="slds-var-m-around_medium">
-        <lightning-input 
+        <lightning-input
+          required="true"
           label="* FirstName" 
           value={firstName} 
           placeholder="Enter First Name..."
@@ -10,6 +11,7 @@
         </lightning-input>
 
         <lightning-input 
+          required="true"
           label="* LastName" 
           value={lastName} 
           placeholder="Enter Last Name..."
@@ -18,6 +20,7 @@
         </lightning-input>
 
         <lightning-input 
+          required="true"
           label="* Email" 
           value={email}   
           placeholder="Enter Email..."
