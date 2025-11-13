@@ -1,47 +1,97 @@
-.search {
-    font-family: Georgia, 'Times New Roman', Times, serif;
-    color: royalblue;
-    font-weight: bold !important;
-    background-color: white !important;
-    border-radius: 5px;
-    height: 180px;
-    width: 100%;
+.query-editor-container {
+    position: relative;
+}
 
+.block-notes-textarea {
+    font-family: 'Courier New', monospace !important;
+    font-size: 14px !important;
+    white-space: pre !important;
+    overflow-wrap: normal !important;
+    overflow-x: auto !important;
+    line-height: 1.5 !important;
+    tab-size: 4 !important;
+    resize: vertical !important;
+    min-height: 200px !important;
+    border: 1px solid #dddbda !important;
+    border-radius: 4px !important;
+    padding: 12px !important;
+    background-color: #fafaf9 !important;
 }
-.searchTitle {
-    font-family: Georgia, 'Times New Roman', Times, serif;
-    font-size: 20px !important;
-    padding: 10px 10px 0px 10px;
 
+.suggestions-container {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 9000;
+    margin-top: 2px;
 }
-.inputSearch {
-    width: 100%;
-    padding: 0px 30px;
-}
-.buttonReset {
-    color: white;
-    border: none;
-    padding: 10px 0px 10px 30px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 16px;
-    margin: 10px 0px;
+
+.suggestion-item {
     cursor: pointer;
+    padding: 8px 12px;
+    border-bottom: 1px solid #f3f2f2;
 }
-.buttonOrderLink {
-    padding: 10px 0px 5px 30px !important;
-    font-size: 16px !important;
-    margin: 10px 0px !important;
-    cursor: pointer !important;
-}
-.buttonAccountLink {
-    padding: 10px 0px 5px 30px !important;
-    font-size: 16px !important;
-    margin: 10px 0px !important;
-    cursor: pointer !important;
-}
-.orderName {
-    padding: 10px 0px 5px 30px !important;
 
+.suggestion-item:hover,
+.suggestion-item.slds-is-selected {
+    background-color: #f3f2f2;
+}
+
+.suggestion-item:last-child {
+    border-bottom: none;
+}
+
+.execute-button {
+    margin-right: 12px;
+}
+
+/* Estilos para el área de texto tipo block de notas */
+.block-notes-textarea:focus {
+    border-color: #1589ee !important;
+    background-color: #ffffff !important;
+    box-shadow: 0 0 3px #1589ee !important;
+}
+
+/* Mejoras visuales para las sugerencias */
+.slds-dropdown_length-10 {
+    max-height: 300px;
+    overflow-y: auto;
+    box-shadow: 0 2px 3px 0 rgba(0, 0, 0, 0.16);
+    border: 1px solid #dddbda;
+}
+
+/* Responsive design */
+@media (max-width: 480px) {
+    .slds-p-around_medium {
+        padding: 12px;
+    }
+    
+    .block-notes-textarea {
+        font-size: 12px !important;
+        min-height: 150px !important;
+    }
+    
+    .suggestions-container {
+        position: relative;
+        margin-top: 8px;
+    }
+}
+
+/* Estilos para el estado de carga */
+.slds-spinner_container {
+    z-index: 9001;
+}
+
+/* Mejoras para la tabla de resultados */
+.slds-card {
+    border: 1px solid #dddbda;
+    border-radius: 4px;
+    box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.10);
+}
+
+.slds-card__header {
+    padding: 16px;
+    border-bottom: 1px solid #dddbda;
+    background-color: #fafaf9;
 }

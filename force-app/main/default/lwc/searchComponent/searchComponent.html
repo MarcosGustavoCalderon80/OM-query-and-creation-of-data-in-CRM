@@ -1,36 +1,130 @@
 <template>
-    <div class="search">
-        <h4 class='searchTitle'>Search account or order</h4>
-        <lightning-input class="inputSearch" value={searchTerm} onchange={handleSearchChange} placeholder="Enter Account Name, Order Name or ID..."></lightning-input>
-
-        <lightning-button label="Reset" class="buttonReset" onclick={clearInputField}></lightning-button>
-    </div>
-
-        <template if:true={accounts.length}>
-            <lightning-card title="Resultados de Cuentas">
-                <ul>
-                    <template for:each={accounts} for:item="account">
-                        <li key={account.Id}>
-                            <p class="orderName"><strong>Nombre de la Cuenta:</strong> {account.Name} - ({account.Id})</p>
-                            <lightning-button class="buttonAccountLink" variant="link" label={account.Id} onclick={handleAccountClick} data-id={account.Id}></lightning-button>
-                        </li>
-                    </template>
-                </ul>
-            </lightning-card>
-        </template>
-
-        <template if:true={orders.length}>
-            <lightning-card title="Resultados de Órdenes">
-                <ul>
-                    <template for:each={orders} for:item="order">
-                        <li key={order.Id}>
-                            <template if:true={order.Name}>
-                                <p class="orderName"><strong>Nombre de la Orden:</strong> {order.Name} - ({order.Id})</p>
+    <div class="slds-p-around_medium">
+        <!-- Editor de consulta SOQL mejorado -->
+        <div class="query-editor-container slds-margin-bottom_medium">
+            <div class="slds-form-element">
+                <label class="slds-form-element__label">SOQL Query</label>
+                <div class="slds-form-element__control">
+                    <textarea
+                        class="slds-textarea block-notes-textarea"
+                        value={soqlQuery}
+                        onchange={handleQueryChange}
+                        onkeydown={handleKeyDown}
+                        placeholder="SELECT Id, Name FROM Account WHERE ..."
+                        rows="8"
+                        style="font-family: 'Courier New', monospace; font-size: 14px; white-space: pre; overflow-wrap: normal; overflow-x: auto;"
+                    ></textarea>
+                </div>
+            </div>
+            
+            <!-- Sugerencias de campos mejoradas -->
+            <template if:true={showSuggestions}>
+                <div class="suggestions-container slds-dropdown-trigger slds-dropdown-trigger_click slds-is-open">
+                    <div class="slds-dropdown slds-dropdown_left slds-dropdown_length-10" style="width: 400px; max-height: 300px; overflow-y: auto;">
+                        <ul class="slds-dropdown__list" role="listbox">
+                            <template for:each={fieldSuggestions} for:item="suggestion" for:index="index">
+                                <li key={suggestion} 
+                                    class={suggestionClass(index)}
+                                    role="option"
+                                    data-field={suggestion}
+                                    onclick={handleFieldClick}
+                                    tabindex="0">
+                                    <span class="slds-truncate" title={suggestion}>
+                                        <lightning-icon 
+                                            icon-name="standard:field" 
+                                            size="x-small" 
+                                            class="slds-m-right_x-small">
+                                        </lightning-icon>
+                                        {suggestion}
+                                    </span>
+                                </li>
                             </template>
-                            <lightning-button class="buttonOrderLink" variant="link" label={order.OrderNumber} data-id={order.Id}></lightning-button>
-                        </li>
-                    </template>
-                </ul>
-            </lightning-card>
+                        </ul>
+                    </div>
+                </div>
+            </template>
+        </div>
+
+        <!-- Botón de ejecución -->
+        <div class="slds-m-top_medium slds-grid slds-grid_align-center">
+            <lightning-button
+                label="Ejecutar Consulta"
+                onclick={handleExecuteQuery}
+                variant="brand"
+                disabled={isLoading}
+                class="execute-button"
+            ></lightning-button>
+            
+            <template if:true={isLoading}>
+                <lightning-spinner alternative-text="Loading" size="small" class="slds-m-left_small"></lightning-spinner>
+            </template>
+        </div>
+
+        <!-- Mensaje de error -->
+        <template if:true={error}>
+            <div class="slds-m-top_medium">
+                <div class="slds-notify slds-notify_alert slds-theme_error slds-theme_alert-texture" role="alert">
+                    <span class="slds-assistive-text">Error</span>
+                    <span class="slds-icon_container slds-icon-utility-error slds-m-right_x-small" title="Error">
+                        <lightning-icon icon-name="utility:error" size="x-small"></lightning-icon>
+                    </span>
+                    <h2>{error}</h2>
+                </div>
+            </div>
         </template>
+
+        <!-- Resultados -->
+        <template if:true={hasRecords}>
+            <div class="slds-m-top_large">
+                <div class="slds-card">
+                    <div class="slds-card__header slds-grid">
+                        <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                            <div class="slds-media__body">
+                                <h2 class="slds-card__header-title">
+                                    <span class="slds-text-heading_small">Resultados de la Consulta</span>
+                                </h2>
+                            </div>
+                            <div class="slds-no-flex">
+                                <span class="slds-badge slds-badge_lightest">{recordsLength} registros</span>
+                            </div>
+                        </header>
+                    </div>
+                    <div class="slds-card__body">
+                        <lightning-datatable
+                            key-field="Id"
+                            data={records}
+                            columns={columns}
+                            hide-checkbox-column
+                            show-row-number-column
+                            resize-column-disabled
+                            sorted-by="Name"
+                            sorted-direction="asc"
+                        ></lightning-datatable>
+                    </div>
+                </div>
+            </div>
+        </template>
+
+        <!-- Mensaje cuando no hay resultados -->
+        <template if:false={hasRecords}>
+            <template if:false={error}>
+                <template if:false={isLoading}>
+                    <div class="slds-m-top_large slds-text-align_center">
+                        <div class="slds-illustration slds-illustration_small">
+                            <svg class="slds-illustration__svg" viewBox="0 0 454 222" aria-hidden="true">
+                                <g stroke="currentColor" stroke-width="2" fill="none">
+                                    <path d="M20 111h100"></path>
+                                    <path d="M334 111h100"></path>
+                                    <path d="M20 30h414"></path>
+                                    <path d="M20 190h414"></path>
+                                </g>
+                            </svg>
+                            <h3 class="slds-text-heading_medium slds-m-top_medium">No hay resultados</h3>
+                            <p class="slds-text-body_regular slds-m-top_x-small">Ejecuta una consulta para ver los resultados</p>
+                        </div>
+                    </div>
+                </template>
+            </template>
+        </template>
+    </div>
 </template>
